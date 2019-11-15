@@ -2,13 +2,20 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const sharp = require('sharp');
 
+function setOutputImagesFolder() {
+  settings.outputImagesFolder = `${settings.inputImagesFolder}/${
+    settings.outputExt
+  }_${settings.width}_${settings.greyscale ? 'greyscale' : ''}`;
+}
+
 const settings = {
   inputImagesFolder: '/home/lyd/Images',
-  width: 1080,
+  width: 1080, // 1440, 2560
   //height: 720,
+  greyscale: false,
   outputExt: 'auto' // 'webp'
 };
-settings.outputImagesFolder = `${settings.inputImagesFolder}/${settings.outputExt} ${settings.width}`;
+setOutputImagesFolder();
 
 const outputExts = ['jpg', 'webp'];
 
@@ -41,14 +48,7 @@ function convertAllImages() {
         for (let i = 0; i < 2; i++) {
           let outputImage = `${settings.outputImagesFolder}/${fileName}.${outputExts[i]}`;
           sharpImage(inputImage, outputImage);
-          //sizes[i] = getFilesizeInBytes(outputImage);
         }
-
-        // if (sizes[0] >= sizez[1]) {
-        //   //supr 0
-        // } else {
-        //   //sup;
-        // }
       }
     });
   });
@@ -56,6 +56,7 @@ function convertAllImages() {
 
 function sharpImage(inputImage, outputImage) {
   sharp(inputImage)
+    .greyscale(settings.greyscale)
     .resize(
       settings.width //,settings.height
     )
@@ -65,11 +66,24 @@ function sharpImage(inputImage, outputImage) {
         console.log(err);
       }
 
-      // console.log(outputImage);
+      if (settings.outputExt === 'auto') {
+        // remove bigger file if exists
 
-      // const outputName = outputImage.split('.')[]
+        const tmp = outputImage.split('.');
+        tmp.pop();
 
-      // outputExts[0]
+        const twinFile1 = tmp.join('') + '.' + outputExts[0];
+        const twinFile2 = tmp.join('') + '.' + outputExts[1];
+
+        if (fs.existsSync(twinFile1) && fs.existsSync(twinFile2)) {
+          // remove the bigest file
+          if (getFilesizeInBytes(twinFile1) > getFilesizeInBytes(twinFile2)) {
+            fs.unlinkSync(twinFile1);
+          } else {
+            fs.unlinkSync(twinFile2);
+          }
+        }
+      }
     });
 }
 
@@ -94,11 +108,27 @@ function setSettings(settingsKey) {
       rl.question(
         `${settingsKey} ? default is ${settings[settingsKey]} press 'd' for default or enter a new value: `,
         answer => {
-          if (answer !== 'd') {
+          if (answer === 'd') {
+            // set outputImagesFolder if we have a new outputExt
+            if (settingsKey === 'outputExt') {
+              setOutputImagesFolder();
+            }
+          } else {
+            // set width to a number
+            if (settingsKey === 'width') {
+              answer = parseInt(answer, 10);
+            }
+
+            // set greyscale to a boolean
+            if (settingsKey === 'greyscale') {
+              if (answer === 'true' || answer === true) {
+                answer = true;
+              } else {
+                answer = false;
+              }
+            }
+
             settings[settingsKey] = answer;
-          }
-          if (settingsKey === 'outputExt') {
-            settings.outputImagesFolder = `${settings.inputImagesFolder}/${settings.outputExt} ${settings.width}`;
           }
 
           rl.close();
