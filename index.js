@@ -3,7 +3,7 @@ const mkdirp = require('mkdirp');
 const sharp = require('sharp');
 
 const settings = {
-  inputImagesFolder: '/home/lyd/ddd',
+  inputImagesFolder: '/home/lyd/Images',
   width: 1080,
   //height: 720,
   outputExt: 'webp'
@@ -42,7 +42,6 @@ function sharpImage(inputImage, outputImage) {
       settings.width //,settings.height
     )
     .toFile(outputImage, function(err) {
-      // output.jpg is a 300 pixels wide and 200 pixels high image
       // containing a scaled and cropped version of input.jpg
       if (err) {
         console.log(err);
@@ -52,33 +51,37 @@ function sharpImage(inputImage, outputImage) {
 
 const readline = require('readline');
 
-// console.log(settings);
-
-const settingsKeys = Object.keys(settings);
+const settingsKeys = Object.keys(settings).reverse();
 let max = settingsKeys.length - 1;
 
 function setSettings(settingsKey) {
   if (max >= 0) {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
+    if (settingsKey !== 'outputImagesFolder') {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      rl.question(
+        `${settingsKey} ? default is ${settings[settingsKey]} press 'd' for default or enter a new value: `,
+        answer => {
+          if (answer !== 'd') {
+            settings[settingsKey] = answer;
+          }
+          if (settingsKey === 'outputExt') {
+            settings.outputImagesFolder = `${settings.inputImagesFolder}/${settings.outputExt} ${settings.width}`;
+          }
 
-    rl.question(
-      `${settingsKey} ? default is ${settings[settingsKey]} press 'd' for default or enter a new value: `,
-      answer => {
-        // TODO: Log the answer in a database
-        //console.log(`Your value: ${answer}`);
-        if (answer !== 'd') {
-          settings[settingsKey] = answer;
+          rl.close();
+          max--;
+
+          setSettings(settingsKeys[max]);
         }
+      );
+    } else {
+      max--;
 
-        rl.close();
-        max--;
-
-        setSettings(settingsKeys[max]);
-      }
-    );
+      setSettings(settingsKeys[max]);
+    }
   } else {
     doStuff();
   }
@@ -86,9 +89,21 @@ function setSettings(settingsKey) {
 
 function doStuff() {
   console.log(settings);
-  makeOutputImagesFolder();
 
-  convertAllImages();
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question(`Ok ? y/n `, answer => {
+    if (answer === 'y') {
+      makeOutputImagesFolder();
+
+      convertAllImages();
+    }
+
+    rl.close();
+  });
 }
 
 setSettings(settingsKeys[max]);
