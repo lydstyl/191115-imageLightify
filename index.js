@@ -6,9 +6,11 @@ const settings = {
   inputImagesFolder: '/home/lyd/Images',
   width: 1080,
   //height: 720,
-  outputExt: 'webp'
+  outputExt: 'auto' // 'webp'
 };
 settings.outputImagesFolder = `${settings.inputImagesFolder}/${settings.outputExt} ${settings.width}`;
+
+const outputExts = ['jpg', 'webp'];
 
 function makeOutputImagesFolder() {
   mkdirp(settings.outputImagesFolder, function(err) {
@@ -25,13 +27,29 @@ function convertAllImages() {
       const stats = fs.statSync(`${settings.inputImagesFolder}/${file}`);
       if (stats.isDirectory()) return;
 
-      const fileName = file.split('.');
-      fileName.pop();
-      const outputImage = `${settings.outputImagesFolder}/${fileName}.${settings.outputExt}`;
-
       const inputImage = `${settings.inputImagesFolder}/${file}`;
 
-      sharpImage(inputImage, outputImage);
+      const fileName = file.split('.');
+      fileName.pop();
+
+      if (settings.outputExt !== 'auto') {
+        const outputImage = `${settings.outputImagesFolder}/${fileName}.${settings.outputExt}`;
+        sharpImage(inputImage, outputImage);
+      } else {
+        const sizes = [0, 0];
+
+        for (let i = 0; i < 2; i++) {
+          let outputImage = `${settings.outputImagesFolder}/${fileName}.${outputExts[i]}`;
+          sharpImage(inputImage, outputImage);
+          //sizes[i] = getFilesizeInBytes(outputImage);
+        }
+
+        // if (sizes[0] >= sizez[1]) {
+        //   //supr 0
+        // } else {
+        //   //sup;
+        // }
+      }
     });
   });
 }
@@ -46,7 +64,19 @@ function sharpImage(inputImage, outputImage) {
       if (err) {
         console.log(err);
       }
+
+      // console.log(outputImage);
+
+      // const outputName = outputImage.split('.')[]
+
+      // outputExts[0]
     });
+}
+
+function getFilesizeInBytes(filename) {
+  var stats = fs.statSync(filename);
+  var fileSizeInBytes = stats['size'];
+  return fileSizeInBytes;
 }
 
 const readline = require('readline');
