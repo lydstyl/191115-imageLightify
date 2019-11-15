@@ -1,24 +1,100 @@
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const sharp = require('sharp');
+const readline = require('readline');
 
-function setOutputImagesFolder() {
-  settings.outputImagesFolder = `${settings.inputImagesFolder}/${
-    settings.outputExt
-  }_${settings.width}_${settings.greyscale ? 'greyscale' : ''}`;
-}
-
+// settings.js
 const settings = {
   inputImagesFolder: '/home/lyd/Images',
-  width: 1080, // 1440, 2560
+  width: 720, // 1080, 1440, 1920, 2160, 2560, 3840
   //height: 720,
   greyscale: false,
   outputExt: 'auto' // 'webp'
 };
-setOutputImagesFolder();
 
 const outputExts = ['jpg', 'webp'];
 
+const settingsKeys = Object.keys(settings).reverse();
+let max = settingsKeys.length - 1;
+
+// to be exported
+function setOutputImagesFolder() {
+  settings.outputImagesFolder = `${settings.inputImagesFolder}/${
+    settings.outputExt
+  }_${settings.width}${settings.greyscale ? '_greyscale' : ''}`;
+
+  console.log('Default settings: ', settings);
+}
+
+function setSettings(settingsKey) {
+  if (max >= 0) {
+    if (settingsKey !== 'outputImagesFolder') {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      rl.question(
+        `${settingsKey} = ${settings[settingsKey]} ? 'y' or enter a new value: `,
+        answer => {
+          if (answer === 'y') {
+            // set outputImagesFolder if we have a new outputExt
+            if (settingsKey === 'outputExt') {
+              setOutputImagesFolder();
+            }
+          } else {
+            // set width to a number
+            if (settingsKey === 'width') {
+              answer = parseInt(answer, 10);
+            }
+
+            // set greyscale to a boolean
+            if (settingsKey === 'greyscale') {
+              if (answer === 'true' || answer === true) {
+                answer = true;
+              } else {
+                answer = false;
+              }
+            }
+
+            settings[settingsKey] = answer;
+          }
+
+          rl.close();
+          max--;
+
+          setSettings(settingsKeys[max]);
+        }
+      );
+    } else {
+      max--;
+
+      setSettings(settingsKeys[max]);
+    }
+  } else {
+    askConvertConfirmation();
+  }
+}
+
+function askConvertConfirmation() {
+  console.log(settings);
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question(`Ok ? y/n `, answer => {
+    if (answer === 'y') {
+      makeOutputImagesFolder();
+
+      convertAllImages();
+    }
+
+    rl.close();
+  });
+}
+
+//
 function makeOutputImagesFolder() {
   mkdirp(settings.outputImagesFolder, function(err) {
     // path exists unless there was an error
@@ -93,77 +169,6 @@ function getFilesizeInBytes(filename) {
   return fileSizeInBytes;
 }
 
-const readline = require('readline');
-
-const settingsKeys = Object.keys(settings).reverse();
-let max = settingsKeys.length - 1;
-
-function setSettings(settingsKey) {
-  if (max >= 0) {
-    if (settingsKey !== 'outputImagesFolder') {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-      rl.question(
-        `${settingsKey} ? default is ${settings[settingsKey]} press 'd' for default or enter a new value: `,
-        answer => {
-          if (answer === 'd') {
-            // set outputImagesFolder if we have a new outputExt
-            if (settingsKey === 'outputExt') {
-              setOutputImagesFolder();
-            }
-          } else {
-            // set width to a number
-            if (settingsKey === 'width') {
-              answer = parseInt(answer, 10);
-            }
-
-            // set greyscale to a boolean
-            if (settingsKey === 'greyscale') {
-              if (answer === 'true' || answer === true) {
-                answer = true;
-              } else {
-                answer = false;
-              }
-            }
-
-            settings[settingsKey] = answer;
-          }
-
-          rl.close();
-          max--;
-
-          setSettings(settingsKeys[max]);
-        }
-      );
-    } else {
-      max--;
-
-      setSettings(settingsKeys[max]);
-    }
-  } else {
-    doStuff();
-  }
-}
-
-function doStuff() {
-  console.log(settings);
-
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  rl.question(`Ok ? y/n `, answer => {
-    if (answer === 'y') {
-      makeOutputImagesFolder();
-
-      convertAllImages();
-    }
-
-    rl.close();
-  });
-}
+setOutputImagesFolder();
 
 setSettings(settingsKeys[max]);
