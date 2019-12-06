@@ -1,7 +1,5 @@
 const readline = require('readline');
-
 const { askConvertConfirmation } = require('./askConvertConfirmation.js');
-
 const { settings, settingsKeys } = require('./settings.js');
 
 let max = settingsKeys.length - 1;

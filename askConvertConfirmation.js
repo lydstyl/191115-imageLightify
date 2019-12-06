@@ -2,6 +2,7 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const readline = require('readline');
 const sharp = require('sharp');
+const sizeOf = require('image-size');
 
 const {
   settings,
@@ -65,7 +66,9 @@ function sharpImage(inputImage, outputImage) {
   sharp(inputImage)
     .greyscale(settings.greyscale)
     .resize(
-      settings.width //,settings.height
+      sizeOf(inputImage).width < settings.width
+        ? sizeOf(inputImage).width
+        : settings.width
     )
     .toFile(outputImage, function(err) {
       // containing a scaled and cropped version of input.jpg
