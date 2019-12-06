@@ -6,3 +6,5 @@ npm i
 npm start
 
 follow terminal instructions
+
+https://www.youtube.com/watch?v=qTEAgRWs-Dw&feature=youtu.be
