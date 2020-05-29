@@ -1,8 +1,8 @@
 const settings = {
-  inputImagesFolder: '/home/lyd/Images',
-  width: 720, // 1080, 1440, 1920, 2160, 2560, 3840
+  inputImagesFolder: '/home/lyd/Images/dd',
+  width: 720, // 1080, 1366, 1440, 1920, 2160, 2560, 3840
   greyscale: false,
-  outputExt: 'auto' // 'webp, jpg, png'
+  outputExt: 'jpg', // 'auto, webp, jpg, png'
 };
 
 exports.settings = settings;

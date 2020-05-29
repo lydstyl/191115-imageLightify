@@ -12,9 +12,9 @@ function setSettings(settingsKey) {
         output: process.stdout
       });
       rl.question(
-        `${settingsKey} = ${settings[settingsKey]} ? 'y' or enter a new value: `,
+        `${settingsKey} = ${settings[settingsKey]} ? press enter or write the new value: `,
         answer => {
-          if (answer !== 'y') {
+          if (answer !== '') {
             // set width to a number
             if (settingsKey === 'width') {
               answer = parseInt(answer, 10);

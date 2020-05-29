@@ -17,7 +17,7 @@ exports.askConvertConfirmation = () => {
   });
 
   rl.question(`Ok ? y/n `, answer => {
-    if (answer === 'y') {
+    if (answer !== 'n') {
       makeOutputImagesFolder();
 
       convertAllImages();
