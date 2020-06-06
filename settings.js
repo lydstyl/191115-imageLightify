@@ -1,6 +1,6 @@
 const settings = {
-  inputImagesFolder: '/home/lyd/Images/dd',
-  width: 720, // 1080, 1366, 1440, 1920, 2160, 2560, 3840
+  inputImagesFolder: '/home/gab/06/605',
+  width: 1200, // 1080, 1366, 1440, 1920, 2160, 2560, 3840
   greyscale: false,
   outputExt: 'jpg', // 'auto, webp, jpg, png'
 };
