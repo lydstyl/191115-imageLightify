@@ -1,5 +1,5 @@
 
-POST http://localhost:3000/resize
+POST http://localhost:4000/resize
 Content-Type: application/json
 
 {
@@ -15,6 +15,6 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000
+GET http://localhost:4000
 
 ###
