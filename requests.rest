@@ -1,3 +1,13 @@
+
+POST http://localhost:3000/resize
+Content-Type: application/json
+
+{
+    "width": "600"
+}
+
+###
+
 GET http://localhost:3000
 
 ###

@@ -1,36 +1,25 @@
-const fs = require('fs');
-const mkdirp = require('mkdirp');
-const readline = require('readline');
-const sharp = require('sharp');
-const sizeOf = require('image-size');
+const fs = require("fs");
+const mkdirp = require("mkdirp");
+const readline = require("readline");
+const sharp = require("sharp");
+const sizeOf = require("image-size");
 
 const {
   settings,
   outputExts,
-  setOutputImagesFolder
-} = require('./settings.js');
+  setOutputImagesFolder,
+} = require("./settings.js");
 
-exports.askConvertConfirmation = () => {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
+exports.resize = () => {
+  makeOutputImagesFolder();
 
-  rl.question(`Ok ? y/n `, answer => {
-    if (answer !== 'n') {
-      makeOutputImagesFolder();
-
-      convertAllImages();
-    }
-
-    rl.close();
-  });
+  convertAllImages();
 };
 
 function makeOutputImagesFolder() {
   setOutputImagesFolder();
 
-  mkdirp(settings.outputImagesFolder, function(err) {
+  mkdirp(settings.outputImagesFolder, function (err) {
     // path exists unless there was an error
     if (err) {
       console.log(err);
@@ -40,16 +29,16 @@ function makeOutputImagesFolder() {
 
 function convertAllImages() {
   fs.readdir(settings.inputImagesFolder, (err, files) => {
-    files.forEach(file => {
+    files.forEach((file) => {
       const stats = fs.statSync(`${settings.inputImagesFolder}/${file}`);
       if (stats.isDirectory()) return;
 
       const inputImage = `${settings.inputImagesFolder}/${file}`;
 
-      const fileName = file.split('.');
+      const fileName = file.split(".");
       fileName.pop();
 
-      if (settings.outputExt !== 'auto') {
+      if (settings.outputExt !== "auto") {
         const outputImage = `${settings.outputImagesFolder}/${fileName}.${settings.outputExt}`;
         sharpImage(inputImage, outputImage);
       } else {
@@ -70,18 +59,18 @@ function sharpImage(inputImage, outputImage) {
         ? sizeOf(inputImage).width
         : settings.width
     )
-    .toFile(outputImage, function(err) {
+    .toFile(outputImage, function (err) {
       // containing a scaled and cropped version of input.jpg
       if (err) {
         console.log(err);
       }
 
-      if (settings.outputExt === 'auto') {
-        const tmp = outputImage.split('.');
+      if (settings.outputExt === "auto") {
+        const tmp = outputImage.split(".");
         tmp.pop();
 
-        const twinFile1 = tmp.join('') + '.' + outputExts[0];
-        const twinFile2 = tmp.join('') + '.' + outputExts[1];
+        const twinFile1 = tmp.join("") + "." + outputExts[0];
+        const twinFile2 = tmp.join("") + "." + outputExts[1];
 
         if (fs.existsSync(twinFile1) && fs.existsSync(twinFile2)) {
           // remove the bigest file
@@ -97,6 +86,6 @@ function sharpImage(inputImage, outputImage) {
 
 function getFilesizeInBytes(filename) {
   var stats = fs.statSync(filename);
-  var fileSizeInBytes = stats['size'];
+  var fileSizeInBytes = stats["size"];
   return fileSizeInBytes;
 }

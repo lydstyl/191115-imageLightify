@@ -46,7 +46,7 @@ function setSettings(settingsKey, max) {
   }
 }
 
-function test() {
+function resize(settings) {
   console.log("Default settings: ", settings);
 
   let max = settingsKeys.length - 1;
@@ -54,4 +54,4 @@ function test() {
   setSettings(settingsKeys[max], max);
 }
 
-exports.test = test;
+exports.resize = resize;
