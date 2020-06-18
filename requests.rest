@@ -3,7 +3,14 @@ POST http://localhost:3000/resize
 Content-Type: application/json
 
 {
-    "width": "600"
+    "settings": 
+        {
+            "width": "600",
+            "inputImagesFolder": "/home/gab/imagesFolder",
+            "greyscale": false,
+            "outputExt": "jpg"
+        }
+
 }
 
 ###
@@ -11,15 +18,3 @@ Content-Type: application/json
 GET http://localhost:3000
 
 ###
-
-GET http://localhost:4000/privates
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IkdhYiIsImlhdCI6MTU5MjQxODU0NX0.Ie36fA794VwTh-VGGIh6G0bhIHOYAUB_is0VuJuOmYc
-
-###
-
-POST http://localhost:3500/login
-Content-Type: application/json
-
-{
-    "userName": "Gab"
-}

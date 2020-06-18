@@ -7,18 +7,10 @@ const app = express();
 app.use(express.json());
 
 app.post("/resize", (req, res) => {
-  const width = parseInt(req.body.width, 10);
-  console.log("width", width);
+  const { settings } = req.body;
 
-  settings = {
-    width, // width: 1200, // 1080, 1366, 1440, 1920, 2160, 2560, 3840
-
-    inputImagesFolder: "/home/gab/imagesFolder",
-    greyscale: false,
-    outputExt: "jpg", // 'auto, webp, jpg, png',
-
-    outputExts: ["jpg", "webp"],
-  };
+  settings.width = parseInt(settings.width, 10);
+  settings.outputExts = ["jpg", "webp"];
 
   resize(settings);
 
