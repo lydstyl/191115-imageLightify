@@ -15,7 +15,9 @@ app.post("/resize", (req, res) => {
 
     inputImagesFolder: "/home/gab/imagesFolder",
     greyscale: false,
-    outputExt: "jpg", // 'auto, webp, jpg, png'
+    outputExt: "jpg", // 'auto, webp, jpg, png',
+
+    outputExts: ["jpg", "webp"],
   };
 
   resize(settings);

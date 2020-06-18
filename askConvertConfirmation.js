@@ -1,23 +1,18 @@
 const fs = require("fs");
 const mkdirp = require("mkdirp");
-const readline = require("readline");
 const sharp = require("sharp");
 const sizeOf = require("image-size");
 
-const {
-  settings,
-  outputExts,
-  setOutputImagesFolder,
-} = require("./settings.js");
+exports.resize = (settings) => {
+  makeOutputImagesFolder(settings);
 
-exports.resize = () => {
-  makeOutputImagesFolder();
-
-  convertAllImages();
+  convertAllImages(settings);
 };
 
-function makeOutputImagesFolder() {
-  setOutputImagesFolder();
+function makeOutputImagesFolder(settings) {
+  settings.outputImagesFolder = `${settings.inputImagesFolder}/${
+    settings.outputExt
+  }_${settings.width}${settings.greyscale ? "_greyscale" : ""}`;
 
   mkdirp(settings.outputImagesFolder, function (err) {
     // path exists unless there was an error
@@ -27,7 +22,7 @@ function makeOutputImagesFolder() {
   });
 }
 
-function convertAllImages() {
+function convertAllImages(settings) {
   fs.readdir(settings.inputImagesFolder, (err, files) => {
     files.forEach((file) => {
       const stats = fs.statSync(`${settings.inputImagesFolder}/${file}`);
@@ -40,18 +35,18 @@ function convertAllImages() {
 
       if (settings.outputExt !== "auto") {
         const outputImage = `${settings.outputImagesFolder}/${fileName}.${settings.outputExt}`;
-        sharpImage(inputImage, outputImage);
+        sharpImage(inputImage, outputImage, settings);
       } else {
         for (let i = 0; i < 2; i++) {
-          let outputImage = `${settings.outputImagesFolder}/${fileName}.${outputExts[i]}`;
-          sharpImage(inputImage, outputImage);
+          let outputImage = `${settings.outputImagesFolder}/${fileName}.${settings.outputExts[i]}`;
+          sharpImage(inputImage, outputImage, settings);
         }
       }
     });
   });
 }
 
-function sharpImage(inputImage, outputImage) {
+function sharpImage(inputImage, outputImage, settings) {
   sharp(inputImage)
     .greyscale(settings.greyscale)
     .resize(
@@ -69,8 +64,8 @@ function sharpImage(inputImage, outputImage) {
         const tmp = outputImage.split(".");
         tmp.pop();
 
-        const twinFile1 = tmp.join("") + "." + outputExts[0];
-        const twinFile2 = tmp.join("") + "." + outputExts[1];
+        const twinFile1 = tmp.join("") + "." + settings.outputExts[0];
+        const twinFile2 = tmp.join("") + "." + settings.outputExts[1];
 
         if (fs.existsSync(twinFile1) && fs.existsSync(twinFile2)) {
           // remove the bigest file
