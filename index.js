@@ -1,28 +1,26 @@
-const readline = require('readline');
-const { askConvertConfirmation } = require('./askConvertConfirmation.js');
-const { settings, settingsKeys } = require('./settings.js');
+const readline = require("readline");
+const { askConvertConfirmation } = require("./askConvertConfirmation.js");
+const { settings, settingsKeys } = require("./settings.js");
 
-let max = settingsKeys.length - 1;
-
-function setSettings(settingsKey) {
+function setSettings(settingsKey, max) {
   if (max >= 0) {
-    if (settingsKey !== 'outputImagesFolder') {
+    if (settingsKey !== "outputImagesFolder") {
       const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
+        output: process.stdout,
       });
       rl.question(
         `${settingsKey} = ${settings[settingsKey]} ? press enter or write the new value: `,
-        answer => {
-          if (answer !== '') {
+        (answer) => {
+          if (answer !== "") {
             // set width to a number
-            if (settingsKey === 'width') {
+            if (settingsKey === "width") {
               answer = parseInt(answer, 10);
             }
 
             // set greyscale to a boolean
-            if (settingsKey === 'greyscale') {
-              if (answer === 'true' || answer === true) {
+            if (settingsKey === "greyscale") {
+              if (answer === "true" || answer === true) {
                 answer = true;
               } else {
                 answer = false;
@@ -48,6 +46,12 @@ function setSettings(settingsKey) {
   }
 }
 
-console.log('Default settings: ', settings);
+function test() {
+  console.log("Default settings: ", settings);
 
-setSettings(settingsKeys[max]);
+  let max = settingsKeys.length - 1;
+
+  setSettings(settingsKeys[max], max);
+}
+
+exports.test = test;
